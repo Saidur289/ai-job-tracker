@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String?
+  passwordHash  String
+  avatarUrl     String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  jobs          Job[]
+  resumes       Resume[]
+  notes         Note[]
+  interviews    Interview[]
+  calendarEvents CalendarEvent[]
+}
+
+model Job {
+  id              String       @id @default(cuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company         String
+  position        String
+  location        String?
+  jobType         JobType      @default(FULL_TIME)
+  status          JobStatus    @default(SAVED)
+  salary          String?
+  jobUrl          String?
+  description     String?      @db.Text
+  companyLogo     String?
+  companyWebsite  String?
+  companySize     String?
+  industry        String?
+  appliedAt       DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  notes           Note[]
+  interviews      Interview[]
+  resumeId        String?
+  resume          Resume?      @relation(fields: [resumeId], references: [id])
+  atsScore        Int?
+  coverLetter     String?      @db.Text
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Resume {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  fileUrl     String
+  fileType    String
+  parsedText  String?  @db.Text
+  aiReview    String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  jobs        Job[]
+
+  @@index([userId])
+}
+
+model Interview {
+  id          String            @id @default(cuid())
+  jobId       String
+  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        InterviewType
+  scheduledAt DateTime
+  duration    Int?
+  location    String?
+  meetingUrl  String?
+  status      InterviewStatus   @default(SCHEDULED)
+  feedback    String?           @db.Text
+  questions   InterviewQuestion[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([jobId])
+}
+
+model InterviewQuestion {
+  id           String    @id @default(cuid())
+  interviewId  String
+  interview    Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  question     String    @db.Text
+  answer       String?   @db.Text
+  aiGenerated  Boolean   @default(false)
+  category     String?
+  createdAt    DateTime  @default(now())
+
+  @@index([interviewId])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId     String?
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  title     String
+  content   String   @db.Text
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([jobId])
+}
+
+model CalendarEvent {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  startAt     DateTime
+  endAt       DateTime
+  color       String?
+  type        EventType @default(CUSTOM)
+  referenceId String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([startAt])
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  FREELANCE
+}
+
+enum JobStatus {
+  SAVED
+  APPLIED
+  SCREENING
+  INTERVIEWING
+  OFFER
+  REJECTED
+  WITHDRAWN
+  ACCEPTED
+}
+
+enum InterviewType {
+  PHONE
+  VIDEO
+  ONSITE
+  TECHNICAL
+  BEHAVIORAL
+  PANEL
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum EventType {
+  INTERVIEW
+  DEADLINE
+  FOLLOW_UP
+  CUSTOM
+}
