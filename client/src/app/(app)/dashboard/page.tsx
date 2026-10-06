@@ -9,6 +9,22 @@ import { Briefcase, TrendingUp, Calendar, Target, Loader2 } from 'lucide-react';
 import { formatDate, jobStatusColors, jobStatusLabels, cn } from '@/lib/utils';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
 
 export default function DashboardPage() {
   const { data: jobsData, isLoading: jobsLoading } = useQuery({
@@ -60,74 +76,82 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your job search progress</p>
-      </div>
+    <motion.div 
+      className="space-y-8"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={itemVariants} className="flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground text-lg">Overview of your job search progress</p>
+      </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      <motion.div variants={itemVariants} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/50">
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900">
-              <Briefcase className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-1 ring-blue-100 dark:ring-blue-800">
+              <Briefcase className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Jobs</p>
-              <p className="text-2xl font-bold">{totalJobs}</p>
+              <p className="text-sm font-medium text-muted-foreground">Total Jobs</p>
+              <p className="text-3xl font-semibold tracking-tight">{totalJobs}</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/50">
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900">
-              <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 ring-1 ring-purple-100 dark:ring-purple-800">
+              <TrendingUp className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Active Apps</p>
-              <p className="text-2xl font-bold">{activeApps}</p>
+              <p className="text-sm font-medium text-muted-foreground">Active Apps</p>
+              <p className="text-3xl font-semibold tracking-tight">{activeApps}</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/50">
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900">
-              <Calendar className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 ring-1 ring-amber-100 dark:ring-amber-800">
+              <Calendar className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Interviews</p>
-              <p className="text-2xl font-bold">{upcomingInterviews}</p>
+              <p className="text-sm font-medium text-muted-foreground">Interviews</p>
+              <p className="text-3xl font-semibold tracking-tight">{upcomingInterviews}</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/50">
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900">
-              <Target className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-100 dark:ring-emerald-800">
+              <Target className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Offer Rate</p>
-              <p className="text-2xl font-bold">{offerRate}%</p>
+              <p className="text-sm font-medium text-muted-foreground">Offer Rate</p>
+              <p className="text-3xl font-semibold tracking-tight">{offerRate}%</p>
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="col-span-1 border-muted bg-muted/10">
+      <motion.div variants={itemVariants} className="grid gap-6 lg:grid-cols-2">
+        <Card className="col-span-1 border-border/50 shadow-sm bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Pipeline Overview</CardTitle>
-            <CardDescription>Number of applications in each stage</CardDescription>
+            <CardTitle className="text-xl">Pipeline Overview</CardTitle>
+            <CardDescription className="text-sm">Number of applications in each stage</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[320px] pb-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} tickMargin={10} />
-                <YAxis axisLine={false} tickLine={false} fontSize={12} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} tickMargin={12} tick={{ fill: 'var(--muted-foreground)' }} />
+                <YAxis axisLine={false} tickLine={false} fontSize={12} tick={{ fill: 'var(--muted-foreground)' }} />
+                <Tooltip 
+                  cursor={{ fill: 'var(--muted)', opacity: 0.4 }} 
+                  contentStyle={{ borderRadius: '12px', border: '1px solid var(--border)', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', backgroundColor: 'var(--card)' }} 
+                />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={50}>
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -138,9 +162,9 @@ export default function DashboardPage() {
         </Card>
 
         <div className="space-y-6 flex flex-col">
-          <Card className="flex-1">
+          <Card className="flex-1 border-border/50 shadow-sm bg-card/80 backdrop-blur-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Recent Applications</CardTitle>
+              <CardTitle className="text-xl">Recent Applications</CardTitle>
             </CardHeader>
             <CardContent>
               {recentJobs.length === 0 ? (
@@ -163,9 +187,9 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="flex-1">
+          <Card className="flex-1 border-border/50 shadow-sm bg-card/80 backdrop-blur-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Upcoming Interviews</CardTitle>
+              <CardTitle className="text-xl">Upcoming Interviews</CardTitle>
             </CardHeader>
             <CardContent>
               {upcomingInterviewsList.length === 0 ? (
@@ -188,7 +212,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

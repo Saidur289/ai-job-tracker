@@ -41,7 +41,7 @@ export function Sidebar() {
     <TooltipProvider >
       <aside
         className={cn(
-          'hidden md:flex h-screen flex-col border-r border-border bg-card transition-all duration-300 relative z-40',
+          'hidden md:flex h-screen flex-col border-r border-border/40 bg-card/80 backdrop-blur-xl transition-all duration-300 relative z-40',
           collapsed ? 'w-16' : 'w-[280px]'
         )}
       >
