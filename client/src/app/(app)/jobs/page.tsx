@@ -23,10 +23,25 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { useRef } from 'react';
 
 const KANBAN_COLUMNS: JobStatus[] = ['SAVED', 'APPLIED', 'SCREENING', 'INTERVIEWING', 'OFFER', 'ACCEPTED', 'REJECTED'];
 
 export default function JobsPage() {
+  const container = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.from('.gsap-animate', {
+      y: 40,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'expo.out',
+    });
+  }, { scope: container });
+
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   
@@ -96,11 +111,11 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)]">
-      <div className="flex items-center justify-between shrink-0 mb-6">
+    <div ref={container} className="flex flex-col h-[calc(100vh-2rem)]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0 mb-6 gsap-animate">
         <div>
-          <h1 className="text-2xl font-bold">Jobs Board</h1>
-          <p className="text-muted-foreground">{localJobs.length} total applications</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Jobs Board</h1>
+          <p className="text-muted-foreground text-lg">{localJobs.length} total applications</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer">
@@ -151,23 +166,24 @@ export default function JobsPage() {
         </Dialog>
       </div>
 
-      <div className="relative max-w-md shrink-0 mb-6">
+      <div className="relative max-w-md shrink-0 mb-6 gsap-animate">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search by company or position..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-10 pl-10"
+          className="h-10 pl-10 border-border/50 bg-card/50 backdrop-blur-sm"
         />
       </div>
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex flex-1 gap-4 overflow-x-auto pb-4 items-start h-full scrollbar-thin">
-          {KANBAN_COLUMNS.map((status) => {
-            const columnJobs = filteredJobs.filter((j) => j.status === status);
-            
-            return (
-              <div key={status} className="w-[320px] flex-shrink-0 flex flex-col max-h-full bg-muted/30 rounded-xl p-3 border border-border/50">
+      <div className="flex-1 min-h-0 gsap-animate">
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="flex gap-4 overflow-x-auto pb-4 items-start h-full scrollbar-thin">
+            {KANBAN_COLUMNS.map((status) => {
+              const columnJobs = filteredJobs.filter((j) => j.status === status);
+              
+              return (
+                <div key={status} className="w-[320px] flex-shrink-0 flex flex-col max-h-full bg-muted/20 backdrop-blur-md rounded-xl p-3 border border-border/40 shadow-sm">
                 <div className="mb-3 flex items-center justify-between shrink-0 px-1">
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary" className={cn("px-2.5 py-1", jobStatusColors[status])}>
@@ -197,7 +213,7 @@ export default function JobsPage() {
                               style={{...provided.draggableProps.style}}
                             >
                               <Link href={`/jobs/${job.id}`} className="block">
-                                <Card className={cn("cursor-grab active:cursor-grabbing transition-shadow hover:border-primary/30", snapshot.isDragging && "shadow-lg border-primary ring-1 ring-primary/20 rotate-1 scale-[1.02]")}>
+                                <Card className={cn("cursor-grab active:cursor-grabbing transition-all hover:border-primary/40 hover:shadow-md border-border/40 bg-card/90 backdrop-blur-sm", snapshot.isDragging && "shadow-xl border-primary ring-1 ring-primary/30 rotate-2 scale-105")}>
                                   <CardContent className="p-4">
                                     <p className="font-semibold text-sm leading-tight text-foreground">{job.position}</p>
                                     <div className="mt-2 space-y-1.5">
@@ -239,7 +255,8 @@ export default function JobsPage() {
             );
           })}
         </div>
-      </DragDropContext>
+        </DragDropContext>
+      </div>
     </div>
   );
 }

@@ -9,24 +9,23 @@ import { Briefcase, TrendingUp, Calendar, Target, Loader2 } from 'lucide-react';
 import { formatDate, jobStatusColors, jobStatusLabels, cn } from '@/lib/utils';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { motion } from 'framer-motion';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
-};
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { useRef } from 'react';
 
 export default function DashboardPage() {
+  const container = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.from('.gsap-animate', {
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.1,
+      ease: 'expo.out',
+    });
+  }, { scope: container });
+
   const { data: jobsData, isLoading: jobsLoading } = useQuery({
     queryKey: ['jobs'],
     queryFn: async () => {
@@ -75,20 +74,16 @@ export default function DashboardPage() {
     return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
   }
 
+
   return (
-    <motion.div 
-      className="space-y-8"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div variants={itemVariants} className="flex flex-col gap-2">
+    <div ref={container} className="space-y-8">
+      <div className="flex flex-col gap-2 gsap-animate">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">Dashboard</h1>
         <p className="text-muted-foreground text-lg">Overview of your job search progress</p>
-      </motion.div>
+      </div>
 
       {/* Stats */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 gsap-animate">
         <Card className="border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/50">
           <CardContent className="flex items-center gap-4 p-6">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-1 ring-blue-100 dark:ring-blue-800">
@@ -133,9 +128,9 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
-      <motion.div variants={itemVariants} className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 gsap-animate">
         <Card className="col-span-1 border-border/50 shadow-sm bg-card/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-xl">Pipeline Overview</CardTitle>
@@ -147,9 +142,9 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} tickMargin={12} tick={{ fill: 'var(--muted-foreground)' }} />
                 <YAxis axisLine={false} tickLine={false} fontSize={12} tick={{ fill: 'var(--muted-foreground)' }} />
-                <Tooltip 
-                  cursor={{ fill: 'var(--muted)', opacity: 0.4 }} 
-                  contentStyle={{ borderRadius: '12px', border: '1px solid var(--border)', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', backgroundColor: 'var(--card)' }} 
+                <Tooltip
+                  cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
+                  contentStyle={{ borderRadius: '12px', border: '1px solid var(--border)', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', backgroundColor: 'var(--card)' }}
                 />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={50}>
                   {chartData.map((entry, index) => (
@@ -212,7 +207,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
